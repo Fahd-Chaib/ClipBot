@@ -20,8 +20,8 @@ def cmd_run(a, cfg):
     urls = parse_urls(a.urls + [os.environ.get("CLIPBOT_URLS", "")])
     if not urls:
         die("Aucun lien. Exemple : python -m clipbot run https://www.youtube.com/watch?v=XXXX")
-    code = run(urls, cfg, force=a.force, analyze_only=a.analyze_only, deadline_min=a.deadline)
-    if not a.analyze_only and not a.no_publish:
+    code = run(urls, cfg, force=a.force, analyze_only=a.analyze_only, deadline_min=a.deadline, preview=a.preview)
+    if not a.analyze_only and not a.preview and not a.no_publish:
         from .publisher import publish_pass
 
         publish_pass(cfg)
@@ -153,6 +153,7 @@ def main(argv=None):
     p.add_argument("urls", nargs="*")
     p.add_argument("--force", action="store_true", help="retraiter une vidéo déjà vue")
     p.add_argument("--analyze-only", action="store_true", help="choisir les moments sans rien monter ni publier")
+    p.add_argument("--preview", action="store_true", help="monter les clips pour les voir : rien en file, rien publié")
     p.add_argument("--no-publish", action="store_true", help="ne pas lancer l'envoi YouTube juste après")
     p.add_argument("--deadline", type=float, default=330.0, help="minutes max avant d'arrêter de lancer de nouvelles vidéos")
     p.set_defaults(fn=cmd_run)

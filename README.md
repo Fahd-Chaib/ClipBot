@@ -86,7 +86,9 @@ Le bot renouvelle le jeton tout seul (stocké chiffré).
 1. `mode = demo` : rend 2 vidéos de test (anglais + arabe), sans rien publier → télécharge-les dans *Artifacts*.
 2. `mode = analyze` + un lien : choisit les moments forts et écrit un rapport (`analysis_*.md`) avec les liens
    horodatés — idéal pour régler `selection.min_score`. Rien n'est téléchargé en vidéo ni publié.
-3. `mode = run` : le vrai passage, tout est programmé automatiquement. Les premières semaines, regarde les clips
+3. `mode = preview` + un lien : monte vraiment les clips et te les donne en *Artifacts* (avec titres et descriptions dans
+   `preview_clips.md`), sans rien mettre en file ni publier. C'est le test à faire avant le premier vrai passage.
+4. `mode = run` : le vrai passage, tout est programmé automatiquement. Les premières semaines, regarde les clips
    produits (Artifacts de l'exécution, 3 jours) et mets `platforms.tiktok/instagram.enabled: false` le temps de
    te faire confiance. Tu peux aussi désactiver YouTube de la même façon pour un test à blanc.
 

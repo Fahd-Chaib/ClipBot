@@ -9,11 +9,11 @@ on:
         required: false
         type: string
       mode:
-        description: "run = tout faire · analyze = juste choisir les moments (rien publié) · demo = vidéo de test"
+        description: "run = tout faire et programmer · preview = monter les clips pour les voir (rien publié) · analyze = juste choisir les moments · demo = vidéo de test"
         required: true
         default: run
         type: choice
-        options: [run, analyze, demo]
+        options: [run, preview, analyze, demo]
       force:
         description: "Retraiter une vidéo déjà vue"
         required: false
@@ -94,6 +94,7 @@ jobs:
             case "$MODE" in
               demo)    python -m clipbot demo ;;
               analyze) python -m clipbot run --analyze-only $ARGS ;;
+              preview) python -m clipbot run --preview $ARGS ;;
               *)       python -m clipbot run $ARGS ;;
             esac
           } 2>&1 | tee state/last_run.log

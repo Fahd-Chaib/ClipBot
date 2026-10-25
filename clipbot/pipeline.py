@@ -107,7 +107,7 @@ def process_video(url: str, cfg: dict, q: dict, force: bool, analyze_only: bool)
     return results
 
 
-def run(urls: list[str], cfg: dict, force=False, analyze_only=False, deadline_min: float = 330.0) -> int:
+def run(urls: list[str], cfg: dict, force=False, analyze_only=False, deadline_min: float = 330.0, preview=False) -> int:
     t0 = time.time()
     ensure(OUT, WORK)
     q = Q.load()
@@ -126,10 +126,26 @@ def run(urls: list[str], cfg: dict, force=False, analyze_only=False, deadline_mi
             except Exception as e:  # noqa: BLE001
                 log(f"✗ {url} : {e}\n{traceback.format_exc(limit=3)}")
     finally:
-        if produced:
+        if produced and preview:
+            _write_preview(produced)
+        elif produced:
             _enqueue(produced, cfg, q)
     log(f"\nTerminé : {len(produced)} clip(s) prêt(s), {refused} lien(s) refusé(s), {(time.time() - t0) / 60:.1f} min")
     return 0
+
+
+def _write_preview(clips: list[dict]):
+    """Aperçu : clips montés dans out/clips + leurs textes dans out/preview_*.md (rien n'est mis en file ni publié)."""
+    ensure(OUT)
+    lines = ["# Aperçu des clips (rien n'a été publié)", ""]
+    for c in clips:
+        t = c["texts"]
+        lines += [f"## {c['title']}", f"- fichier : `{c['asset']}` · score {c['score']:.1f}", "",
+                  "**Description YouTube**", "", t["youtube"]["description"], "",
+                  f"**Légende TikTok** : {t['tiktok']['caption']}", ""]
+    (OUT / "preview_clips.md").write_text("\n".join(lines), encoding="utf-8")
+    (OUT / "preview_clips.json").write_text(json.dumps(clips, ensure_ascii=False, indent=1), encoding="utf-8")
+    log(f"  👀 aperçu : {len(clips)} clip(s) dans out/clips — rien mis en file, rien publié")
 
 
 def _enqueue(clips: list[dict], cfg: dict, q: dict):

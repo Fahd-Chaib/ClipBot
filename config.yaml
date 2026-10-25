@@ -47,7 +47,7 @@ creators: []
 # ------------------------------------------------------------
 selection:
   min_score: 7.0            # sur 10 : plus haut = plus sélectif (pas de quota fixe)
-  min_seconds: 15
+  min_seconds: 20
   max_seconds: 58           # plafond Shorts (ne pas dépasser 58)
   window_minutes: 8         # taille des tranches de transcription envoyées au LLM
   overlap_minutes: 1

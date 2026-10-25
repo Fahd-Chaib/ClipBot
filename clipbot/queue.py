@@ -65,6 +65,8 @@ def is_finished(item: dict, enabled: list[str]) -> bool:
 
 def archive_finished(q: dict, enabled: list[str]) -> list[dict]:
     """Déplace dans l'historique les éléments terminés ; renvoie ceux à nettoyer côté stockage."""
+    if not enabled:  # aucune plateforme active : on garde tout, rien n'est perdu
+        return []
     done, keep = [], []
     for i in q["items"]:
         (done if is_finished(i, enabled) else keep).append(i)

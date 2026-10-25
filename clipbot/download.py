@@ -23,6 +23,7 @@ def _cookies(cfg: dict) -> str | None:
 def _opts(cfg: dict, **extra) -> dict:
     o = {
         "quiet": True,
+        "noprogress": True,
         "no_warnings": True,
         "noplaylist": True,
         "retries": 5,

@@ -19,11 +19,12 @@ A GREAT clip:
 - is fully self-contained: a stranger understands it with no prior context;
 - contains ONE clear payoff: a punchline, a revelation, a strong emotion, a surprising fact, a powerful story beat, or a precise useful tip;
 - ends cleanly right after the payoff (never mid-thought, never on filler);
-- lasts between {min_s} and {max_s} seconds in total (use the timestamps to estimate).
+- lasts between {min_s} and {max_s} seconds in total (use the timestamps to estimate); aim for 25-50 seconds when the story needs it, never pad with filler.
 
 Rules:
 - Be a harsh judge. Most moments are average. Score 1-10; 7 = good, 9+ = exceptional. Only report moments you would genuinely post.
 - Use ONLY the segment ids shown. A clip is a continuous run of segments from start_segment to end_segment (inclusive).
+- Write "reason" and "hook" in the SAME language as the transcript.
 - Do not return overlapping clips. Return at most {n} clips; returning an empty list is fine.
 - Never pick pure sponsor reads, intros/outros, or housekeeping ("subscribe", "link in description").
 
