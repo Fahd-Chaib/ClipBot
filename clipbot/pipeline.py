@@ -67,9 +67,16 @@ def process_video(url: str, cfg: dict, q: dict, force: bool, analyze_only: bool)
 
     work = WORK / vid
     ensure(work)
-    audio = download.download_audio(url, work, cfg)
-    tr = transcribe.transcribe(audio, work, cfg, creator.get("language"))
-    audio.unlink(missing_ok=True)
+    cache = WORK / "transcripts" / f"{vid}.json"
+    if cache.exists():
+        tr = json.loads(cache.read_text(encoding="utf-8"))
+        log("  ♻ transcription déjà faite, on la réutilise")
+    else:
+        audio = download.download_audio(url, work, cfg)
+        tr = transcribe.transcribe(audio, work, cfg, creator.get("language"))
+        audio.unlink(missing_ok=True)
+        ensure(cache.parent)
+        cache.write_text(json.dumps(tr, ensure_ascii=False), encoding="utf-8")
     clips = highlights.find_clips(tr, cfg, info, url)
     _write_report(info, url, clips)
     if analyze_only or not clips:
@@ -104,6 +111,7 @@ def process_video(url: str, cfg: dict, q: dict, force: bool, analyze_only: bool)
         except Exception as e:  # noqa: BLE001
             log(f"  ✗ clip ignoré : {e}\n{traceback.format_exc(limit=3)}")
     shutil.rmtree(work, ignore_errors=True)
+    cache.unlink(missing_ok=True)
     return results
 
 

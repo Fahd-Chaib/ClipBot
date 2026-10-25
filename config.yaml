@@ -67,8 +67,9 @@ transcription:
 #  LLM gratuit (gpt-oss-120b) : Groq d'abord, Cerebras en relais
 # ------------------------------------------------------------
 llm:
-  providers: [groq, cerebras]
+  providers: [groq, groq_small, cerebras]   # cerebras : ignoré sans clé (il demande maintenant une carte bancaire)
   groq_model: "openai/gpt-oss-120b"
+  groq_fallback_model: "openai/gpt-oss-20b"   # 2e quota gratuit sur Groq
   cerebras_model: "gpt-oss-120b"
   reasoning_effort: low
   tpm_budget: 6500                  # tokens/minute à ne pas dépasser (quota gratuit Groq ≈ 8000)

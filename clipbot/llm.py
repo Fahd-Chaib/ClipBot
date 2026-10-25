@@ -11,6 +11,8 @@ from .util import env, log, parse_json_loose
 
 ENDPOINTS = {
     "groq": ("https://api.groq.com/openai/v1/chat/completions", "GROQ_API_KEY", "groq_model"),
+    # même clé Groq, autre modèle = autre quota gratuit (relais quand gpt-oss-120b a atteint sa limite du jour)
+    "groq_small": ("https://api.groq.com/openai/v1/chat/completions", "GROQ_API_KEY", "groq_fallback_model"),
     "cerebras": ("https://api.cerebras.ai/v1/chat/completions", "CEREBRAS_API_KEY", "cerebras_model"),
 }
 _window: dict[str, deque] = {}  # provider -> deque[(timestamp, tokens)]

@@ -103,6 +103,7 @@ def find_clips(transcript: dict, cfg: dict, info: dict, url: str) -> list[Clip]:
 
     system = SYSTEM.format(min_s=int(min_s), max_s=int(max_s), n=3)
     found: list[Clip] = []
+    failed = 0
     wins = _windows(segs, win_s, ov_s)
     log(f"  🧠 analyse en {len(wins)} tranches")
     for wi, w in enumerate(wins, 1):
@@ -114,7 +115,8 @@ def find_clips(transcript: dict, cfg: dict, info: dict, url: str) -> list[Clip]:
         try:
             data = chat_json(system, user, cfg, max_tokens=1500)
         except Exception as e:  # noqa: BLE001
-            log(f"  ⚠ tranche {wi} ignorée : {e}")
+            log(f"  ⚠ tranche {wi} non analysée : {e}")
+            failed += 1
             continue
         items = data.get("clips", []) if isinstance(data, dict) else data
         valid_ids = {s["id"] for s in w}
@@ -137,6 +139,13 @@ def find_clips(transcript: dict, cfg: dict, info: dict, url: str) -> list[Clip]:
                     seg_start=a2, seg_end=b2,
                 )
             )
+
+    if failed:
+        raise RuntimeError(
+            f"quota LLM gratuit atteint : {failed} tranche(s) sur {len(wins)} non analysées. "
+            "Rien n'est enregistré pour cette vidéo : relance la même commande plus tard (demain). "
+            "La transcription est gardée, elle ne sera pas refaite."
+        )
 
     # dédoublonnage (les tranches se chevauchent) : on garde les mieux notés
     found.sort(key=lambda c: -c.score)

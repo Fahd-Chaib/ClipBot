@@ -44,12 +44,15 @@ accord s'exposent à des réclamations de droits d'auteur et à la suppression d
 | Secret | Où |
 |---|---|
 | `GROQ_API_KEY` | console.groq.com (gratuit) — transcription + LLM |
-| `CEREBRAS_API_KEY` | cloud.cerebras.ai (gratuit, relais conseillé) |
+| `CEREBRAS_API_KEY` | facultatif — Cerebras demande désormais une carte bancaire, inutile pour commencer |
 | `STATE_KEY` | `python -m clipbot keygen` |
 | `YT_COOKIES_B64` | étape 3 |
 | `YOUTUBE_TOKEN_JSON` | étape 4 |
 | `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_TOKEN_JSON` | étape 6 |
 | `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_USER_ID` | étape 5 |
+
+Quota gratuit Groq : le bot utilise gpt-oss-120b puis gpt-oss-20b (quota séparé) ; si les deux sont épuisés, il
+arrête la vidéo SANS rien enregistrer et tu relances le lendemain (la transcription est gardée).
 
 Pour les commandes locales : `pip install -r requirements.txt` puis `cp .env.example .env` et remplis-le.
 
