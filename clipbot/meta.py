@@ -11,6 +11,7 @@ from .transcribe import LANG_NAMES
 SYSTEM = """You write the packaging for one short vertical video clip (YouTube Shorts / TikTok / Reels).
 Write ALL text in {lang_name}, the language spoken in the clip. Style: VERY clickbait — curiosity gap, strong emotion, tension, a number or a bold claim — to maximise clicks.
 HARD RULE: it must stay TRUE to the clip. Never promise something the clip does not deliver, never invent facts or quotes, never attribute to the speaker anything they did not say. Clickbait = framing, not lying.
+STRICT: every number, age, name, score, place and claim in the title / hook / description MUST appear in the clip words. If the words do not say it, do not write it (no invented ages, results, dangers or "secrets"). When unsure, use a question or an emotion-based tease built only from what is said.
 
 You receive the clip's words numbered like "0:Hello 1:world". Return JSON only:
 {{

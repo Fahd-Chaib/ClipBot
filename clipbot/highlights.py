@@ -101,6 +101,8 @@ def find_clips(transcript: dict, cfg: dict, info: dict, url: str) -> list[Clip]:
     cap = int(sel.get("max_clips_per_video", 12))
     segs = transcript["segments"]
 
+    # les coupes de silence raccourcissent le clip au montage : on vise plus long pour rester ≥ min_seconds
+    min_s = min(min_s + 6.0, max_s - 4.0)
     system = SYSTEM.format(min_s=int(min_s), max_s=int(max_s), n=3)
     found: list[Clip] = []
     failed = 0
