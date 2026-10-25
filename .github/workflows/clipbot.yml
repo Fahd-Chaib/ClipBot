@@ -89,11 +89,20 @@ jobs:
         run: |
           ARGS=""
           if [ "$FORCE" = "true" ]; then ARGS="$ARGS --force"; fi
-          case "$MODE" in
-            demo)    python -m clipbot demo ;;
-            analyze) python -m clipbot run --analyze-only $ARGS ;;
-            *)       python -m clipbot run $ARGS ;;
-          esac
+          mkdir -p state
+          {
+            case "$MODE" in
+              demo)    python -m clipbot demo ;;
+              analyze) python -m clipbot run --analyze-only $ARGS ;;
+              *)       python -m clipbot run $ARGS ;;
+            esac
+          } 2>&1 | tee state/last_run.log
+
+      - name: Rapports (lisibles sur la branche state)
+        if: always()
+        run: |
+          mkdir -p state/reports
+          cp out/*.md out/*.json state/reports/ 2>/dev/null || true
 
       - name: Sauvegarder la mémoire du bot
         if: always()
