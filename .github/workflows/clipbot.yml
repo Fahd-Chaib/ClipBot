@@ -61,9 +61,13 @@ jobs:
 
       - name: Cookies YouTube
         env:
+          YT_COOKIES_TXT: ${{ secrets.YT_COOKIES_TXT }}
           YT_COOKIES_B64: ${{ secrets.YT_COOKIES_B64 }}
         run: |
-          if [ -n "$YT_COOKIES_B64" ]; then
+          if [ -n "$YT_COOKIES_TXT" ]; then
+            printf '%s\n' "$YT_COOKIES_TXT" > cookies.txt
+            chmod 600 cookies.txt
+          elif [ -n "$YT_COOKIES_B64" ]; then
             echo "$YT_COOKIES_B64" | base64 -d | gunzip > cookies.txt
             chmod 600 cookies.txt
           fi

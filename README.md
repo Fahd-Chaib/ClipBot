@@ -57,7 +57,8 @@ Pour les commandes locales : `pip install -r requirements.txt` puis `cp .env.exa
 YouTube bloque presque toujours les téléchargements depuis les serveurs GitHub (« confirm you're not a bot »).
 1. Avec une extension type *Get cookies.txt LOCALLY*, exporte les cookies de youtube.com (de préférence d'un
    **compte Google secondaire** dédié au bot, pas ton compte principal).
-2. `python -m clipbot cookies pack cookies.txt` → copie la longue ligne affichée dans le secret `YT_COOKIES_B64`.
+2. Le plus simple : colle le contenu du fichier tel quel dans le secret `YT_COOKIES_TXT` (cookies de youtube.com seulement).
+   Si le fichier dépasse 48 000 caractères : `python -m clipbot cookies pack cookies.txt` → secret `YT_COOKIES_B64`.
 3. Les cookies expirent : si les téléchargements échouent un jour, refais cette étape.
 
 ### 4. YouTube (publication)
