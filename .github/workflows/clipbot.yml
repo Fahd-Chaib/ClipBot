@@ -71,6 +71,11 @@ jobs:
             echo "$YT_COOKIES_B64" | base64 -d | gunzip > cookies.txt
             chmod 600 cookies.txt
           fi
+          if [ -f cookies.txt ]; then
+            echo "cookies chargés : $(grep -vc '^#' cookies.txt) lignes, dont $(grep -c -E 'youtube\.com|google\.com' cookies.txt) YouTube/Google, connexion: $(grep -c -E '__Secure-3PSID|LOGIN_INFO' cookies.txt)"
+          else
+            echo "AUCUN cookie chargé (secret YT_COOKIES_TXT vide ou absent)"
+          fi
 
       - name: ClipBot
         env:
