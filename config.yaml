@@ -4,7 +4,7 @@
 
 channel:
   name: "Mes Clips"
-  handle: "@monpseudo"          # filigrane sur la vidéo
+  handle: "@ClipVaultMA"          # filigrane sur la vidéo
   # Fuseau des heures de publication. Le Maroc est en UTC+1 toute l'année (sauf Ramadan) ;
   # « Etc/GMT-1 » = UTC+1 fixe, fiable quelle que soit la base de fuseaux de la machine.
   timezone: "Etc/GMT-1"
