@@ -68,12 +68,37 @@ def find_font(custom: str, rtl: bool) -> str:
         f = _fc(pattern, fam)
         if f:
             return f
-    return DEJAVU if Path(DEJAVU).exists() else ""
+    fallbacks = [
+        "C:/Windows/Fonts/arialbd.ttf", "C:/Windows/Fonts/segoeuib.ttf",
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf", DEJAVU,
+    ]
+    for cand in fallbacks:
+        if Path(cand).exists():
+            return cand
+    return ""
 
 
 @lru_cache(maxsize=1)
 def find_emoji_font() -> str | None:
-    return _fc("Noto Color Emoji", "Noto Color Emoji")
+    f = _fc("Noto Color Emoji", "Noto Color Emoji")
+    if f:
+        return f
+    # Windows / macOS : on télécharge une fois la police d'emojis en couleur (Noto, licence libre)
+    from .util import WORK
+
+    dest = WORK / "fonts" / "NotoColorEmoji.ttf"
+    if dest.exists() and dest.stat().st_size > 1_000_000:
+        return str(dest)
+    try:
+        import requests
+
+        r = requests.get("https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf", timeout=120)
+        r.raise_for_status()
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(r.content)
+        return str(dest)
+    except Exception:  # noqa: BLE001
+        return None
 
 
 @lru_cache(maxsize=32)

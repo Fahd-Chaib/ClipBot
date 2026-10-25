@@ -28,6 +28,33 @@ def cmd_run(a, cfg):
     return code
 
 
+def cmd_go(a, cfg):
+    """Tout sur ton PC (téléchargement, montage), puis envoi des clips à GitHub qui programme et publie."""
+    from . import queue as Q
+    from . import sync
+    from .pipeline import parse_urls, run
+
+    urls = parse_urls(a.urls + [os.environ.get("CLIPBOT_URLS", "")])
+    if not urls:
+        die("Aucun lien. Exemple : python -m clipbot go https://www.youtube.com/watch?v=XXXX")
+    repo = sync.repo_name()
+    os.environ["GITHUB_REPOSITORY"] = repo
+    os.environ["GH_REPO"] = repo
+    tok = sync.token()
+    if not tok:
+        die("GitHub CLI non connecté. Installe-le (winget install GitHub.cli) puis lance : gh auth login")
+    os.environ["GH_TOKEN"] = tok
+    log(f"Dépôt : {repo}")
+    sync.restore(repo)
+    before = {i["id"] for i in Q.load()["items"]}
+    run(urls, cfg, force=a.force, analyze_only=a.analyze_only, deadline_min=a.deadline, preview=a.preview)
+    if not a.analyze_only and not a.preview:
+        n = sync.push_new_items(repo, before)
+        if n:
+            log(f"\n✅ {n} clip(s) programmé(s). GitHub s'occupe de la suite : ton PC peut s'éteindre.")
+    return 0
+
+
 def cmd_publish(a, cfg):
     from . import queue as Q
     from .publisher import publish_pass
@@ -157,6 +184,14 @@ def main(argv=None):
     p.add_argument("--no-publish", action="store_true", help="ne pas lancer l'envoi YouTube juste après")
     p.add_argument("--deadline", type=float, default=330.0, help="minutes max avant d'arrêter de lancer de nouvelles vidéos")
     p.set_defaults(fn=cmd_run)
+
+    p = sub.add_parser("go", help="tout faire sur ce PC puis envoyer les clips à GitHub (programmation + publication)")
+    p.add_argument("urls", nargs="*")
+    p.add_argument("--force", action="store_true")
+    p.add_argument("--analyze-only", action="store_true")
+    p.add_argument("--preview", action="store_true", help="monter les clips sans rien envoyer")
+    p.add_argument("--deadline", type=float, default=600.0)
+    p.set_defaults(fn=cmd_go)
 
     sub.add_parser("publish", help="envoyer / publier ce qui est dû").set_defaults(fn=cmd_publish)
     sub.add_parser("demo", help="rendre une vidéo de démo sans réseau").set_defaults(fn=cmd_demo)

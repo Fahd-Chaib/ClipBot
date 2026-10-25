@@ -92,7 +92,21 @@ Le bot renouvelle le jeton tout seul (stocké chiffré).
    produits (Artifacts de l'exécution, 3 jours) et mets `platforms.tiktok/instagram.enabled: false` le temps de
    te faire confiance. Tu peux aussi désactiver YouTube de la même façon pour un test à blanc.
 
-## Ton dimanche
+## Ton dimanche (depuis ton PC — recommandé)
+
+YouTube bloque souvent les téléchargements depuis les serveurs GitHub ; depuis ta connexion habituelle ça passe.
+Le PC télécharge et monte les clips, puis GitHub programme et publie tout seul (ton PC peut s'éteindre).
+
+Installation sur ton PC (une seule fois) :
+1. `git clone https://github.com/Fahd-Chaib/ClipBot` puis `cd ClipBot` et `pip install -r requirements.txt`
+2. ffmpeg : `winget install ffmpeg` (Windows) ou `brew install ffmpeg` (Mac)
+3. GitHub CLI : `winget install GitHub.cli` puis `gh auth login`
+4. `copy .env.example .env` et remplis `GROQ_API_KEY` (et `CEREBRAS_API_KEY` si tu en as une)
+
+Chaque dimanche : `python -m clipbot go LIEN1 LIEN2 ...`
+Options : `--preview` (monte les clips dans `out/clips` sans rien envoyer) · `--analyze-only` · `--force`.
+
+## Ton dimanche (depuis GitHub, si le téléchargement passe)
 
 Actions → **ClipBot** → *Run workflow* → colle les liens (un par ligne) → *mode = run*. C'est tout.
 `python -m clipbot status` (en local, ou regarde les logs) montre la file d'attente.
