@@ -1,0 +1,2 @@
+# Optionnel : transcription sans clé API (transcription.engine: local). Lent sur CPU.
+faster-whisper>=1.0

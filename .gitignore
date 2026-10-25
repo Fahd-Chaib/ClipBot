@@ -1,0 +1,8 @@
+.env
+cookies.txt
+secrets/
+state/
+work/
+out/
+__pycache__/
+*.pyc

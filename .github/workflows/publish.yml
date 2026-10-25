@@ -1,0 +1,63 @@
+name: ClipBot publish
+
+# Toutes les heures : envoie les clips à YouTube (programmés) et publie sur TikTok / Instagram à l'heure prévue.
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clipbot-state
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restaurer la mémoire du bot
+        run: bash deploy/state.sh restore
+
+      - name: Rien à publier ?
+        id: check
+        run: |
+          if [ -f state/queue.json ] && python3 -c "import json,sys; sys.exit(0 if json.load(open('state/queue.json')).get('items') else 1)"; then
+            echo "work=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "work=no" >> "$GITHUB_OUTPUT"
+            echo "file d'attente vide"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.check.outputs.work == 'yes'
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Dépendances Python
+        if: steps.check.outputs.work == 'yes'
+        run: pip install -r requirements.txt
+
+      - name: Publier
+        if: steps.check.outputs.work == 'yes'
+        env:
+          STATE_KEY: ${{ secrets.STATE_KEY }}
+          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_TOKEN_JSON: ${{ secrets.TIKTOK_TOKEN_JSON }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+        run: python -m clipbot publish
+
+      - name: Sauvegarder la mémoire du bot
+        if: always() && steps.check.outputs.work == 'yes'
+        run: bash deploy/state.sh save

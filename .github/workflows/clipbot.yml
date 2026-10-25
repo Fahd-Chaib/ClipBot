@@ -1,0 +1,109 @@
+name: ClipBot
+
+# Tu colles les liens ici : Actions → ClipBot → Run workflow
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "Liens YouTube (un par ligne)"
+        required: false
+        type: string
+      mode:
+        description: "run = tout faire · analyze = juste choisir les moments (rien publié) · demo = vidéo de test"
+        required: true
+        default: run
+        type: choice
+        options: [run, analyze, demo]
+      force:
+        description: "Retraiter une vidéo déjà vue"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write   # branche `state` + release de la file d'attente
+
+concurrency:
+  group: clipbot-state
+  cancel-in-progress: false
+
+jobs:
+  clip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: denoland/setup-deno@v2   # yt-dlp en a besoin pour YouTube
+        with:
+          deno-version: v2.x
+
+      - name: Dépendances système
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fontconfig fonts-dejavu-core fonts-noto-core fonts-noto-color-emoji libraqm0 fonts-montserrat || \
+          sudo apt-get install -y -qq ffmpeg fontconfig fonts-dejavu-core fonts-noto-core fonts-noto-color-emoji libraqm0
+          fc-cache -f
+
+      - name: Dépendances Python
+        run: pip install -r requirements.txt
+
+      - name: Restaurer la mémoire du bot
+        run: bash deploy/state.sh restore
+
+      - name: Cookies YouTube
+        env:
+          YT_COOKIES_B64: ${{ secrets.YT_COOKIES_B64 }}
+        run: |
+          if [ -n "$YT_COOKIES_B64" ]; then
+            echo "$YT_COOKIES_B64" | base64 -d | gunzip > cookies.txt
+            chmod 600 cookies.txt
+          fi
+
+      - name: ClipBot
+        env:
+          MODE: ${{ inputs.mode }}
+          FORCE: ${{ inputs.force }}
+          CLIPBOT_URLS: ${{ inputs.urls }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
+          STATE_KEY: ${{ secrets.STATE_KEY }}
+          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_TOKEN_JSON: ${{ secrets.TIKTOK_TOKEN_JSON }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+        run: |
+          ARGS=""
+          if [ "$FORCE" = "true" ]; then ARGS="$ARGS --force"; fi
+          case "$MODE" in
+            demo)    python -m clipbot demo ;;
+            analyze) python -m clipbot run --analyze-only $ARGS ;;
+            *)       python -m clipbot run $ARGS ;;
+          esac
+
+      - name: Sauvegarder la mémoire du bot
+        if: always()
+        run: bash deploy/state.sh save
+
+      - name: Aperçus (3 jours)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clipbot-out
+          path: |
+            out/*.mp4
+            out/clips/*.mp4
+            out/*.md
+            out/*.json
+          retention-days: 3
+          if-no-files-found: ignore

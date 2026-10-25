@@ -1,0 +1,153 @@
+# ============================================================
+#  ClipBot — réglages
+# ============================================================
+
+channel:
+  name: "Mes Clips"
+  handle: "@monpseudo"          # filigrane sur la vidéo
+  # Fuseau des heures de publication. Le Maroc est en UTC+1 toute l'année (sauf Ramadan) ;
+  # « Etc/GMT-1 » = UTC+1 fixe, fiable quelle que soit la base de fuseaux de la machine.
+  timezone: "Etc/GMT-1"
+
+# ------------------------------------------------------------
+#  ACCÈS
+#  false (défaut) : le bot accepte N'IMPORTE QUEL lien YouTube que tu lui donnes.
+#  true           : mode strict, il refuse tout créateur absent de `creators` ci-dessous
+#                   (et exige `permission` rempli) — utile si plusieurs personnes lancent le bot.
+# ------------------------------------------------------------
+access:
+  require_whitelist: false
+
+# ------------------------------------------------------------
+#  CRÉATEURS (facultatif)
+#  Sert à régler le crédit exigé par le programme de clipping d'un créateur précis
+#  (mention, hashtag, suffixe de titre, texte de description). Sans fiche, le bot
+#  crédite automatiquement la chaîne d'origine avec un lien vers la vidéo.
+#  Pour trouver le channel_id : python -m clipbot check-creator <lien de leur vidéo>
+# ------------------------------------------------------------
+creators: []
+#  - name: "Nom du créateur"
+#    channel_ids: ["UCxxxxxxxxxxxxxxxxxxxxxx"]
+#    handles: ["@nomducreateur"]
+#    permission: "https://exemple.com/programme-clipping  (règles du programme)"
+#    language: en                # indice pour la transcription (en, fr, ar…) — optionnel
+#    enabled: true
+#    credit:                     # règles de crédit exigées par CE créateur
+#      mention: "@nomducreateur" # affiché dans les descriptions
+#      title_suffix: ""          # ex: " | Nom Créateur" si le programme l'exige
+#      hashtags: ["#nomducreateur"]
+#      description: |            # modèle complet (placeholders: {creator} {mention} {url} {video_title})
+#        🎬 Vidéo originale : {video_title}
+#        📺 Créateur : {creator} {mention}
+#        🔗 {url}
+#        ✅ Clip publié avec l'accord du créateur (programme de clipping officiel)
+
+# ------------------------------------------------------------
+#  Sélection des moments forts
+# ------------------------------------------------------------
+selection:
+  min_score: 7.0            # sur 10 : plus haut = plus sélectif (pas de quota fixe)
+  min_seconds: 15
+  max_seconds: 58           # plafond Shorts (ne pas dépasser 58)
+  window_minutes: 8         # taille des tranches de transcription envoyées au LLM
+  overlap_minutes: 1
+  max_clips_per_video: 12   # garde-fou
+  max_video_minutes: 240
+
+# ------------------------------------------------------------
+#  Transcription
+# ------------------------------------------------------------
+transcription:
+  engine: groq                      # groq (gratuit, rapide) | local (faster-whisper, sans clé)
+  groq_model: whisper-large-v3-turbo
+  local_model: small
+  chunk_seconds: 600
+
+# ------------------------------------------------------------
+#  LLM gratuit (gpt-oss-120b) : Groq d'abord, Cerebras en relais
+# ------------------------------------------------------------
+llm:
+  providers: [groq, cerebras]
+  groq_model: "openai/gpt-oss-120b"
+  cerebras_model: "gpt-oss-120b"
+  reasoning_effort: low
+  tpm_budget: 6500                  # tokens/minute à ne pas dépasser (quota gratuit Groq ≈ 8000)
+
+# ------------------------------------------------------------
+#  Téléchargement
+# ------------------------------------------------------------
+download:
+  max_height: 1080
+  cookies_file: cookies.txt         # créé par le workflow depuis le secret YT_COOKIES_B64
+  pad_seconds: 0.5
+
+# ------------------------------------------------------------
+#  Montage
+# ------------------------------------------------------------
+render:
+  width: 1080
+  height: 1920
+  max_fps: 30
+  crf: 20
+  preset: veryfast
+  silence_cut_min_gap: 0.55         # pause plus longue que ça = coupée
+  silence_keep: 0.12                # on garde un souffle de chaque côté
+  face_sample_fps: 5
+  zoom:
+    jump_zoom: 1.12                 # niveau « plan serré » des coupes alternées
+    push_in: 0.04                   # lent zoom avant dans chaque plan
+    punch: 0.09                     # pulse de zoom sur une punchline
+    min_scene_seconds: 6.0
+  captions:
+    max_words: 3
+    uppercase: true                 # majuscules pour les langues latines
+    size: 84
+    stroke: 9
+    color: "#FFFFFF"
+    accent: "#FFE600"               # mot en cours
+    y_ratio: 0.64                   # position verticale (0 = haut, 1 = bas)
+    emoji_size: 150
+    emoji_seconds: 1.1
+  title:
+    seconds: 3.6
+    size: 62
+    bg: "#FFFFFF"
+    fg: "#111111"
+    y: 250
+  watermark:
+    enabled: true
+    opacity: 0.55
+    size: 40
+    x: 54
+    y: 1500
+  font: ""                          # chemin d'une police .ttf (vide = détection auto)
+
+# ------------------------------------------------------------
+#  Planning : répartition sur la semaine suivante
+# ------------------------------------------------------------
+schedule:
+  start: next_monday                # next_monday | tomorrow
+  days: 7
+  max_per_day: 6
+  window: ["11:00", "22:30"]        # heure locale
+  jitter_minutes: 20
+  min_gap_minutes: 45
+
+# ------------------------------------------------------------
+#  Plateformes
+# ------------------------------------------------------------
+platforms:
+  youtube:
+    enabled: true
+    max_uploads_per_day: 5          # quota API par défaut : 10 000 unités = 6 uploads/jour
+    category_id: "24"               # 24 = Divertissement
+  tiktok:
+    enabled: true
+  instagram:
+    enabled: true
+    api_host: graph.instagram.com
+    api_version: v23.0
+
+queue:
+  release_tag: clipbot-queue        # release GitHub qui héberge les clips en attente
+  max_tries: 3

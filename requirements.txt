@@ -1,0 +1,12 @@
+requests>=2.31
+pyyaml>=6.0
+yt-dlp[default]>=2025.11.0
+google-api-python-client>=2.100
+google-auth>=2.23
+google-auth-oauthlib>=1.1
+cryptography>=42
+opencv-python-headless>=4.9,<5
+numpy>=1.26
+Pillow>=10.1
+arabic-reshaper>=3.0
+python-bidi>=0.4.2
