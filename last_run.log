@@ -1,0 +1,44 @@
+
+━━━ https://www.youtube.com/watch?v=x9x_3pgDdW8
+  ✓ Michou (crédit générique) — « J’AFFRONTE DES ENFANTS CHAMPIONS ! (et j’essaye de les battre) #2 »
+ERROR: [youtube] x9x_3pgDdW8: Sign in to confirm you’re not a bot. This helps protect our community. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies
+✗ https://www.youtube.com/watch?v=x9x_3pgDdW8 : YouTube bloque le téléchargement depuis ce serveur (« confirm you're not a bot »). Ajoute / renouvelle tes cookies : python -m clipbot cookies pack cookies.txt → secret YT_COOKIES_B64.
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py", line 1730, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py", line 1865, in __extract_info
+    ie_result = ie.extract(url)
+                ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yt_dlp/extractor/common.py", line 764, in extract
+    ie_result = self._real_extract(url)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+yt_dlp.utils.ExtractorError: [youtube] x9x_3pgDdW8: Sign in to confirm you’re not a bot. This helps protect our community. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/work/ClipBot/ClipBot/clipbot/download.py", line 66, in download_audio
+    ydl.download([url])
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py", line 3712, in download
+    self.__download_wrapper(self.extract_info)(
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py", line 3685, in wrapper
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+yt_dlp.utils.DownloadError: ERROR: [youtube] x9x_3pgDdW8: Sign in to confirm you’re not a bot. This helps protect our community. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/work/ClipBot/ClipBot/clipbot/pipeline.py", line 122, in run
+    produced += process_video(url, cfg, q, force, analyze_only)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/ClipBot/ClipBot/clipbot/pipeline.py", line 70, in process_video
+    audio = download.download_audio(url, work, cfg)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/ClipBot/ClipBot/clipbot/download.py", line 68, in download_audio
+    raise _explain(e)
+RuntimeError: YouTube bloque le téléchargement depuis ce serveur (« confirm you're not a bot »). Ajoute / renouvelle tes cookies : python -m clipbot cookies pack cookies.txt → secret YT_COOKIES_B64.
+
+
+Terminé : 0 clip(s) prêt(s), 0 lien(s) refusé(s), 0.1 min
